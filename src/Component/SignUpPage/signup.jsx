@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 
 function Signup() {
     let [signupData, setSignupData] = useState({});
@@ -19,14 +20,24 @@ function Signup() {
       if(!signupData.name){
         formError.name = "Name is Required"
       }
-      if(!signupData.email){
+      else if(!signupData.email){
         formError.email = "Email is Required"
       }
-      if(!signupData.password){
+      else if(!signupData.password){
         formError.password = "Password is Required"
       }
-      if(!signupData.confirmPassword){
+      else if(!signupData.confirmPassword){
         formError.confirmPassword = "Confirm Password is Required"
+      }else{
+          axios.post("http://127.0.0.1:5000/api/signup",signupData).then((res)=>{
+            let { success, message, token } = res.data;
+            if(success){
+                localStorage.setItem("auth_token",token);
+                alert(res.data)
+            }
+        }).catch((error)=>{
+            console.log(error.response)
+        })
       }
       setError(formError)
       console.log(error)

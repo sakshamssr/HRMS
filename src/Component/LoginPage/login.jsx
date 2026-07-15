@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+let baseUrl = import.meta.env.VITE_BASE_URL;
 
 function Login(){
     let [loginData,setLoginData] = useState({});
@@ -21,15 +23,32 @@ function Login(){
         if(!loginData.email){
             formError.email = "Email is Required";
         }
-        if(!loginData.password){
+        else if(!loginData.password){
             formError.password = "Password is Required";
         }
-        if(!loginData.confirmPassword){
+        else if(!loginData.confirmPassword){
             formError.confirmPassword = "Confirm Password is Required";
         }
         else{
             console.log("API Data: ", loginData)
-            navigate("/admin/dashboard");
+            axios.post(`${baseUrl}/api/login`,loginData).then((res)=>{
+                let {success, message, role, email, token} = res.data;
+                console.log("Res",res.data)
+                if(success){
+                    if(role == "admin"){
+                        localStorage.setItem("token",token)
+                        alert("Yes")
+                        navigate("/admin/dashboard");
+                    }
+                    else if(role == "user"){
+                        localStorage.setItem("token",token)
+                        alert("Yes")
+                        navigate("/employee/dashboard",{state:email});
+                    }
+                }
+            }).catch(()=>{
+                console.log("No")
+            })
         }
 
 

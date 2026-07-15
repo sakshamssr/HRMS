@@ -1,6 +1,41 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { Outlet } from 'react-router-dom'
+import axios from 'axios'
+import { getDate } from 'date-fns';
+
+let baseUrl = import.meta.env.VITE_BASE_URL
 
 export default function () {
+  let [empformData, setFormData] = useState([]);
+  
+  useEffect(()=>{
+    axios.get(`${baseUrl}/api/get/employee`).then((res)=>{
+      let {success, message,data} = res.data;
+      console.log("Data",data)
+      setFormData(data);
+      console.log("Emp:",empformData)
+      if(success==false){
+        alert(message)
+      }
+    }).catch((error)=>{
+      console.log("Error",error)
+    })
+  },[])
+
+  console.log(empformData);
+  let today = new Date();
+  let five_days_ago = new Date();
+  five_days_ago.setDate(today.getDate()-5)
+  console.log(five_days_ago)
+  console.log("Emp:",empformData)
+
+
+  let recentEmp = empformData.filter((data)=>{
+    let emp_date = new Date(data.doj)
+    return emp_date >=five_days_ago;
+  })
+  console.log(recentEmp)
+
   return (
     <main className="space-y-6">
           <section className="rounded-3xl bg-white p-6 shadow-sm">
@@ -22,7 +57,7 @@ export default function () {
 
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { title: "Total Employees", value: "248" },
+              { title: "Total Employees", value: empformData.length },
               { title: "Pending Leave", value: "12" },
               { title: "Attendance Today", value: "220" },
               { title: "Payroll Due", value: "3" },
@@ -47,15 +82,15 @@ export default function () {
                 Recent Hires
               </h3>
               <ul className="mt-4 space-y-3 text-sm text-slate-600">
-                <li className="rounded-2xl bg-slate-50 px-4 py-3">
-                  Riya Singh - HR Executive
-                </li>
-                <li className="rounded-2xl bg-slate-50 px-4 py-3">
-                  Akash Patel - Software Engineer
-                </li>
-                <li className="rounded-2xl bg-slate-50 px-4 py-3">
-                  Neha Sharma - Finance Analyst
-                </li>
+                {
+                  recentEmp.map((item)=>{
+                    return(
+                    <li className="rounded-2xl bg-slate-50 px-4 py-3">
+                    {item.name} {item.dest}
+                    </li>
+                    )
+                  })
+                }
               </ul>
             </div>
             <div className="rounded-3xl bg-white p-6 shadow-sm">
