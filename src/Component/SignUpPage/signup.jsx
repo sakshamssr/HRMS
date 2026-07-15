@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 
 function Signup() {
+    let baseUrl = import.meta.env.VITE_BASE_URL;
     let [signupData, setSignupData] = useState({});
     let [error, setError] = useState({});
     let formError={};
@@ -29,7 +30,7 @@ function Signup() {
       else if(!signupData.confirmPassword){
         formError.confirmPassword = "Confirm Password is Required"
       }else{
-          axios.post("http://127.0.0.1:5000/api/signup",signupData).then((res)=>{
+          axios.post(`${baseUrl}/api/signup`,signupData).then((res)=>{
             let { success, message, token } = res.data;
             if(success){
                 localStorage.setItem("auth_token",token);
